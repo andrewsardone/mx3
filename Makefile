@@ -37,18 +37,20 @@ GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
 	-Icommon.gypi \
 	mx3.gyp
 
+xb-prettifier := $(shell command -v xcpretty >/dev/null 2>&1 && echo "xcpretty -c" || echo "cat")
+
 # a simple place to test stuff out
 play: build_mac/mx3.xcodeproj objc/play.m
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc | xcpretty -c && ./build/Debug/play_objc
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc | ${xb-prettifier} && ./build/Debug/play_objc
 
 mac: build_mac/mx3.xcodeproj
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
 
 ios: build_ios/mx3.xcodeproj
-	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
+	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
 
 android: GypAndroid.mk
 	GYP_CONFIGURATION=Release NDK_PROJECT_PATH=. ndk-build NDK_APPLICATION_MK=Application.mk -j4
 
 test: build_mac/mx3.xcodeproj
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | xcpretty -c && ./build/Debug/test
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | ${xb-prettifier} && ./build/Debug/test
